@@ -41,6 +41,34 @@
  *
  * console.log(taskResults);
  * <<<<<
+ *
+ * >>>>>
+ * 3.
+ * function fetchExample() {
+ *   return fetch('https://example.com/api/data')
+ *     .then(response => {
+ *       if (!response.ok) {
+ *         throw new Error('Failed to fetch data');
+ *       }
+ *       return response.json();
+ *     })
+ *     .catch(error => {
+ *       throw error;
+ *     });
+ * }
+ *
+ * function handleTaskCompletion({ loading, result, name }) {
+ *   console.log(loading, result, name);
+ * }
+ *
+ * useEffect(() => {
+ *   const factory = new Factory(3, handleTaskCompletion);
+ *
+ *   const taskId = factory.addTask(fetchExample, 'Fetch Task');
+ *
+ *   factory.run();
+ * }, []);
+ * <<<<<
  * </pre>
  *
  * @version 1.0.0
@@ -90,7 +118,7 @@ module.exports = class Factory {
             retryDelay: options.retryDelay ?? this.retryDelay
         };
 
-        this.onTaskCompletion({ loading: true, result: null, name });
+        this.onTaskCompletion({loading: true, result: null, name});
 
         if (options.priority > 0) {
             const insertIndex = this.queue.findIndex(t => t.priority <= task.priority);
@@ -122,7 +150,7 @@ module.exports = class Factory {
 
             this.onTaskCompletion({
                 loading: false,
-                result: { cancelled: true },
+                result: {cancelled: true},
                 name: task.name
             });
 
@@ -138,14 +166,14 @@ module.exports = class Factory {
      * @version 1.0.0
      */
     async executePromise(task, retriesLeft) {
-        const { promiseFn, name, retryDelay } = task;
+        const {promiseFn, name, retryDelay} = task;
 
         try {
             this.activeTasksMap.set(task.id, task);
 
             const result = await promiseFn();
 
-            this.onTaskCompletion({ loading: false, result, name });
+            this.onTaskCompletion({loading: false, result, name});
 
             return result;
         } catch (error) {
@@ -155,7 +183,7 @@ module.exports = class Factory {
                 return this.executePromise(task, retriesLeft - 1);
             } else {
                 this.onError(error);
-                this.onTaskCompletion({ loading: false, result: error, name });
+                this.onTaskCompletion({loading: false, result: error, name});
             }
         } finally {
             this.activeTasksMap.delete(task.id);
